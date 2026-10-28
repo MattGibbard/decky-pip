@@ -2,6 +2,7 @@ import { StateManager } from 'cotton-box';
 import { useContext, createContext } from 'react';
 
 import { Position, ViewMode } from './util';
+import { Bookmark } from './bookmarks';
 import { useStateValue } from 'cotton-box-react';
 
 export interface State {
@@ -11,6 +12,7 @@ export interface State {
     margin: number
     size: number
     url: string
+    bookmarks: Bookmark[]
 }
 
 export const GlobalContext = createContext(new StateManager<State>({} as State));
