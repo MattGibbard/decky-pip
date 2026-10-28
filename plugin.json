@@ -6,6 +6,6 @@
   "publish": {
     "tags": ["web", "video", "pip", "movies", "tv"],
     "description": "Watch your favorite stream while you game!",
-    "image": "https://raw.githubusercontent.com/rossimo/decky-pip/refs/heads/main/picture.jpg"
+    "image": "https://raw.githubusercontent.com/MattGibbard/decky-pip/refs/heads/main/picture.jpg"
   }
 }
