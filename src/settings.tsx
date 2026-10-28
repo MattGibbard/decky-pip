@@ -16,7 +16,7 @@ import { UrlModalWithState } from "./urlModal";
 import { AddBookmarkModalWithState, ManageBookmarksModalWithState } from "./bookmarkModals";
 
 export const Settings = () => {
-    const [{ viewMode, position, margin, url, size, bookmarks }, setGlobalState, stateContext] = useGlobalState();
+    const [{ viewMode, position, margin, url, size, opacity, bookmarks }, setGlobalState, stateContext] = useGlobalState();
     const bookmarked = bookmarks.some(bookmark => bookmark.url == url);
 
     useEffect(() => {
@@ -191,6 +191,23 @@ export const Settings = () => {
                             { label: "M", notchIndex: 1, value: 30 },
                             { label: "L", notchIndex: 2, value: 60 },
                         ]} />
+                </PanelSectionRow>
+                <PanelSectionRow>
+                    <SliderField
+                        label='Opacity'
+                        value={opacity * 100}
+                        onChange={value =>
+                            setGlobalState(state => ({
+                                ...state,
+                                opacity: value / 100,
+                                visible: true,
+                                viewMode: ViewMode.Picture
+                            }))}
+                        min={30}
+                        max={100}
+                        step={10}
+                        showValue={true}
+                        valueSuffix='%' />
                 </PanelSectionRow>
             </>}
             {viewMode != ViewMode.Closed && <>
