@@ -18,9 +18,29 @@ interface BrowserProps {
     y: number
     width: number
     height: number
+    opacity: number
 }
 
-const Browser = ({ url, visible, x, y, width, height }: BrowserProps) => {
+// Steam's browser view has no documented opacity call, so use a native one if this
+// client has it and also fade the page itself.
+const applyOpacity = (view: any, browser: any, opacity: number) => {
+    for (const target of [browser, view]) {
+        if (typeof target?.SetOpacity == 'function') {
+            target.SetOpacity(opacity);
+            break;
+        }
+    }
+
+    const script = `document.documentElement.style.opacity = '${opacity}';`;
+    for (const target of [browser, view]) {
+        if (typeof target?.ExecuteJavaScript == 'function') {
+            target.ExecuteJavaScript(script);
+            break;
+        }
+    }
+}
+
+const Browser = ({ url, visible, x, y, width, height, opacity }: BrowserProps) => {
     useUIComposition(UIComposition.Notification);
 
     const [{ browser, view }] = useState<{ browser: any, view: any }>(() => {
@@ -47,6 +67,14 @@ const Browser = ({ url, visible, x, y, width, height }: BrowserProps) => {
     useEffect(() => {
         browser.SetBounds(x, y, width, height);
     }, [x, y, width, height]);
+
+    useEffect(() => {
+        applyOpacity(view, browser, opacity);
+
+        // a new page load resets the page's style, so apply it again once it settles
+        const timeout = setTimeout(() => applyOpacity(view, browser, opacity), 2000);
+        return () => clearTimeout(timeout);
+    }, [opacity, url]);
 
     useEffect(() => {
         return () => view.Destroy();
@@ -119,7 +147,7 @@ const useDeckComponentBounds = () => {
 
 export const Pip = () => {
     const { nav, qam, virtualKeyboard } = useDeckComponentBounds();
-    const [{ viewMode, position, size, url, visible, ...settings }] = useGlobalState();
+    const [{ viewMode, position, size, opacity, url, visible, ...settings }] = useGlobalState();
 
     const pictureWidth = PICTURE_WIDTH * size;
     const pictureHeight = PICTURE_HEIGHT * size;
@@ -218,6 +246,7 @@ export const Pip = () => {
     return <Browser
         url={url}
         visible={visible}
+        opacity={viewMode == ViewMode.Picture ? opacity : 1}
         {...bounds} />;
 }
 

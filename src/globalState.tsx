@@ -11,6 +11,7 @@ export interface State {
     visible: boolean
     margin: number
     size: number
+    opacity: number
     url: string
     bookmarks: Bookmark[]
 }
