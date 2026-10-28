@@ -20,6 +20,38 @@ interface BrowserProps {
     height: number
 }
 
+// Pages in the player can open popups as bare browser windows that cover the
+// screen and have no way to close them. Steam adds these to the main window's
+// child browser views, so destroy any that appear while the player is open.
+const getChildBrowserViews = (): any[] => {
+    const manager = (window as any).g_PopupManager;
+    const popups = manager?.m_mapPopups ? [...manager.m_mapPopups.values()] : [];
+    return popups.flatMap((popup: any) => popup?.m_rgChildBrowserViews ?? []);
+}
+
+const blockPopups = (view: any) => {
+    const known = new Set(getChildBrowserViews());
+
+    const interval = setInterval(() => {
+        for (const child of getChildBrowserViews()) {
+            if (known.has(child) || child === view.m_browserView) {
+                continue;
+            }
+
+            known.add(child);
+
+            try {
+                child.SetVisible(false);
+                (window as any).SteamClient.BrowserView.Destroy(child);
+            } catch (e) {
+                console.error("pip: failed to close popup", e);
+            }
+        }
+    }, 250);
+
+    return () => clearInterval(interval);
+}
+
 const Browser = ({ url, visible, x, y, width, height }: BrowserProps) => {
     useUIComposition(UIComposition.Notification);
 
@@ -51,6 +83,8 @@ const Browser = ({ url, visible, x, y, width, height }: BrowserProps) => {
     useEffect(() => {
         return () => view.Destroy();
     }, []);
+
+    useEffect(() => blockPopups(view), []);
 
     return null;
 }
