@@ -21,15 +21,14 @@ export default definePlugin(() => {
             position: Position.TopRight,
             margin: 30,
             size: 1,
-            opacity: 1,
             url: "https://netflix.com",
             // merge() combines arrays by index, so only fall back when nothing is saved
             bookmarks: saved.bookmarks ?? DEFAULT_BOOKMARKS
         },
         saved));
 
-    state.watch(({ position, margin, size, opacity, url, bookmarks }) =>
-        localStorage.setItem('pip', JSON.stringify({ position, margin, size, opacity, url, bookmarks })));
+    state.watch(({ position, margin, size, url, bookmarks }) =>
+        localStorage.setItem('pip', JSON.stringify({ position, margin, size, url, bookmarks })));
 
     routerHook.addGlobalComponent("PictureInPicture", () => {
         return <GlobalContext.Provider value={state}>
