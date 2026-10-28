@@ -8,8 +8,11 @@ import { PipOuter } from "./pip";
 import { Settings } from "./settings";
 import { Position, ViewMode } from "./util";
 import { State, GlobalContext } from "./globalState";
+import { DEFAULT_BOOKMARKS } from "./bookmarks";
 
 export default definePlugin(() => {
+    const saved: Partial<State> = JSON.parse(localStorage.getItem('pip') ?? '{}');
+
     const state = new StateManager<State>(merge<Partial<State>, State, Partial<State>>(
         {},
         {
@@ -18,12 +21,14 @@ export default definePlugin(() => {
             position: Position.TopRight,
             margin: 30,
             size: 1,
-            url: "https://netflix.com"
+            url: "https://netflix.com",
+            // merge() combines arrays by index, so only fall back when nothing is saved
+            bookmarks: saved.bookmarks ?? DEFAULT_BOOKMARKS
         },
-        JSON.parse(localStorage.getItem('pip') ?? '{}')));
+        saved));
 
-    state.watch(({ position, margin, size, url }) =>
-        localStorage.setItem('pip', JSON.stringify({ position, margin, size, url })));
+    state.watch(({ position, margin, size, url, bookmarks }) =>
+        localStorage.setItem('pip', JSON.stringify({ position, margin, size, url, bookmarks })));
 
     routerHook.addGlobalComponent("PictureInPicture", () => {
         return <GlobalContext.Provider value={state}>
