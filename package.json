@@ -1,6 +1,6 @@
 {
   "name": "decky-pip",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A plugin for viewing you favorite streams in-game",
   "type": "module",
   "scripts": {
